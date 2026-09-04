@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tailwind.css">
   <script src="js/index.js"></script>
   <title></title>
 
@@ -14,29 +14,29 @@
   
   <img class="bg-img" src="images/SplashFox.jpg">
   
-  <div class="popup welcome-box">
-    <h1>Your artwork on time</h1>
+  <div class="popup fixed inset-0 sm:ml-38 mt-38 w-screen sm:w-110 h-fit flex flex-col px-12 py-10 welcome-box text-base">
+    <h1 class="text-3xl font-bold mb-6">Your artwork on time</h1>
     <p>Gather the power of cloud computing for a smooth rendering experience.</p>
-    <img src="images/BlenderLogo.svg" alt="Blender Logo">      
-    <div>
-      <button class="basic-button" onclick="claimFreeCredits()">
-        Claim your free credits
-      </button>
-    </div>
+    <img src="images/BlenderLogo.svg" alt="Blender Logo" class="my-8 h-16">
+    <button class="highlighted-button mx-auto p-2" onclick="claimFreeCredits()">
+      Claim your free credits
+    </button>
   </div>
   
-  <div class="centered-overlay">
-    <div class="popup">
-      <h1>Sign up</h1>
-      <form method="post" class="login-form">
+  <div id="signup-form" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-100">
+    <div class="popup flex flex-col px-8 py-6 w-screen h-screen sm:h-auto sm:w-sm">
+      <h1 class="font-bold text-3xl">Sign up</h1>
+      <form method="post" class="simple-form">
         <label>Email</label>
-        <input type="email">
+        <input type="email" class="simple-text-input">
         <label>Password</label>
-        <input type="password">
+        <input type="password" class="simple-text-input">
         <label>Confirm password</label>
-        <input type="password">
-        <button type="submit" class="basic-button">Sign up</button>
-        <p>Already have an account? <a href="https://www.google.com">Log in</a></p>
+        <input type="password" class="simple-text-input">
+        <button type="submit" class="highlighted-button p-4 mt-6 w-40 mx-auto">Sign up</button>
+        <p class="mt-4">
+          Already have an account? <a href="https://www.google.com">Log in</a>
+        </p>
       </form>
     </div>
   </div>
