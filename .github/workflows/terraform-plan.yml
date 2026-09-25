@@ -3,6 +3,8 @@ name: Terraform plan
 on:
   pull_request:
     branches: ["main"]
+    paths:
+      - "terraform/**"
 
 env:
   TF_VAR_environment: "dev"
@@ -11,12 +13,21 @@ env:
 
 permissions:
   contents: read
+  issues: write
   pull-requests: write
+  id-token: write
 
 jobs:
   terraform_plan:
     runs-on: ubuntu-latest
+    environment: dev
     steps:
+      - name: "Configue AWS credentials"
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitOpsRole
+          aws-region: eu-south-2
+          
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -28,6 +39,12 @@ jobs:
       - name: Initialize Terraform
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init -input=false
+
+      - name: Validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform fmt -check -recursive
+          terraform validate
 
       - name: Run Terraform plan
         working-directory: ${{ env.TF_WORKING_DIR }}
