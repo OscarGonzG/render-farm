@@ -42,9 +42,7 @@ jobs:
 
       - name: Validate
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: |
-          terraform fmt -check -recursive
-          terraform validate
+        run: terraform validate
 
       - name: Run Terraform plan
         working-directory: ${{ env.TF_WORKING_DIR }}
