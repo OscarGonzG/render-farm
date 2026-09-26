@@ -66,7 +66,7 @@ jobs:
             const COMMENT_OVERHEAD = 200;
 
             const planPath = path.join(process.env.GITHUB_WORKSPACE, process.env.PLAN_FILE);
-
+            console.log(context.repo);
             const comment = async (body) => github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
