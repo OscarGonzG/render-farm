@@ -11,8 +11,6 @@ env:
   TF_IN_AUTOMATION: "true"
   TF_WORKING_DIR: "terraform/dev"
 
-permissions:
-  contents: read
 
 jobs:
   terraform_plan:
@@ -21,6 +19,7 @@ jobs:
     permissions:
       id-token: write
       issues: write
+      contents: read
     steps:
       - name: "Configue AWS credentials"
         uses: aws-actions/configure-aws-credentials@v6.3.0
