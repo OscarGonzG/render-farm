@@ -1,0 +1,97 @@
+name: Terraform plan
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "terraform/**"
+
+env:
+  TF_VAR_environment: "dev"
+  TF_IN_AUTOMATION: "true"
+  TF_WORKING_DIR: "terraform/dev"
+
+
+jobs:
+  terraform_plan:
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      id-token: write
+      issues: write
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Configue AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitOpsRole
+          aws-region: eu-south-2
+          
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_wrapper: false
+
+      - name: Initialize Terraform
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init -input=false
+
+      - name: Validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform validate
+
+      - name: Run Terraform plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform plan -no-color -input=false -lock=false -out=tfplan
+          terraform show -no-color tfplan > tfplan.txt
+
+      - name: Post plan to PR
+        # Still post the plan when the plan step fails.
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          PLAN_FILE: ${{ env.TF_WORKING_DIR }}/tfplan.txt
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const { splitPlan } = require('./scripts/js/split-string.js');
+
+            const MAX_COMMENT_LENGTH = 65536;
+            // Reserved room for the header and the surrounding code fence.
+            const COMMENT_OVERHEAD = 200;
+
+            const planPath = path.join(process.env.GITHUB_WORKSPACE, process.env.PLAN_FILE);
+
+            const comment = async (body) => github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });
+
+            if (!fs.existsSync(planPath)) {
+              await comment('### Terraform plan\n\nNo plan output available, see the workflow logs.');
+              return;
+            }
+
+            const plan = fs.readFileSync(planPath, 'utf8').trim();
+            const chunks = splitPlan(plan, MAX_COMMENT_LENGTH - COMMENT_OVERHEAD);
+
+            if (chunks.length === 0) {
+              await comment('### Terraform plan\n\nEmpty plan output.');
+              return;
+            }
+
+            for (const [index, chunk] of chunks.entries()) {
+              const header = chunks.length > 1
+                ? `### Terraform plan (${index + 1}/${chunks.length})`
+                : '### Terraform plan';
+
+              await comment(`${header}\n\n` + '```terraform\n' + chunk + '\n```\n');
+            }

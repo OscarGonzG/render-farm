@@ -1,0 +1,11 @@
+{
+  "name": "render-farm-scripts",
+  "version": "1.0.0",
+  "description": "CI tooling for the render farm repo",
+  "license": "UNLICENSED",
+  "author": "Óscar González",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test"
+  }
+}
