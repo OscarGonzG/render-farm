@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket       = "render-farm-tfstate-718438899186-eu-south-2-an"
-    key          = "${var.environment}/terraform.tfstate"
+    key          = "dev/terraform.tfstate"
     region       = "eu-south-2"
     use_lockfile = true
     encrypt      = true
@@ -10,5 +10,5 @@ terraform {
 }
 
 provider "aws" {
-  region = "eu-south-1"
+  region = "eu-south-2"
 }
