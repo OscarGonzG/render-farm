@@ -21,7 +21,7 @@ jobs:
       issues: write
       contents: read
     steps:
-      - name: "Configue AWS credentials"
+      - name: Configue AWS credentials
         uses: aws-actions/configure-aws-credentials@v6.3.0
         with:
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitOpsRole
